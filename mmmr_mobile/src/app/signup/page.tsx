@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import API_ROUTES from "@/config/apiRoutes";
+import SearchAd from "@/components/searchAd";
 
 export default function SignupPage() {
     const [email, setEmail] = useState("");
@@ -16,6 +17,7 @@ export default function SignupPage() {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [emailVerified, setEmailVerified] = useState(false);
     const [emailError, setEmailError] = useState("");
+    const [showAddressModal, setShowAddressModal] = useState(false);
     const router = useRouter();
 
     const validateEmail = (email: string) => {
@@ -32,7 +34,8 @@ export default function SignupPage() {
         setEmailError(""); // 오류 메시지 초기화
 
         try {
-            const response = await fetch(`${API_ROUTES.accounts.emailExists}?email=${email}`);
+            const encodeEmail = encodeURIComponent(email);
+            const response = await fetch(`${API_ROUTES.accounts.emailExists}?email=${encodeEmail}`);
             const data = await response.json();
 
             if (response.ok && !data.data.exists) {
@@ -41,6 +44,9 @@ export default function SignupPage() {
                 try {
                     const response = await fetch(API_ROUTES.accounts.sendCodes, {
                         method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
                         body: JSON.stringify({ email: email }),
                     });
                     const data = await response.json();
@@ -65,8 +71,12 @@ export default function SignupPage() {
 
     const handleEmailVerification = async () => {
         try {
-            const response = await fetch(API_ROUTES.accounts.codeVerification(email), {
+            const encodeEmail = encodeURIComponent(email);
+            const response = await fetch(API_ROUTES.accounts.codeVerification(encodeEmail), {
                 method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 body: JSON.stringify({ code: emailCode }),
             });
             const data = await response.json();
@@ -135,6 +145,13 @@ export default function SignupPage() {
 
     return (
         <div className="flex flex-col items-center justify-center h-full w-full">
+            {showAddressModal && (
+                <SearchAd
+                    onClose={() => setShowAddressModal(false)}
+                    onComplete={(selectedAddress) => setAddress(selectedAddress)}
+                />
+            )}
+
             <div className="w-11/12 bg-white rounded-xl p-6 shadow-md space-y-4">
                 <div className="flex flex-col">
                     <label className="block text-sm mb-1 text-gray-500">email</label>
@@ -214,14 +231,21 @@ export default function SignupPage() {
                 </div>
                 <div>
                     <label className="block text-sm mb-1 text-gray-500">address</label>
-                    <div className="relative">
+                    <div className="flex">
                         <input
                             className="w-full p-2 border rounded-md h-10"
                             type="text"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
                             placeholder="주소"
+                            readOnly
                         />
+                        <button
+                            className="bg-blue-300 text-white text-sm break-keep rounded-md ml-2  h-10  w-24 px-2"
+                            onClick={() => setShowAddressModal(true)}
+                        >
+                            주소 검색
+                        </button>
                     </div>
                 </div>
 
