@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 📚 미미미러(MMMR)
 
 ## 📋 목차
@@ -267,3 +268,8 @@ colcon build
 ---
 
 © 2025 MMMR. All Rights Reserved.
+=======
+### Smart mirror Project
+- 정보 관리용 모바일 웹앱 (PWA 사용)
+- 사용자 Mirror 인터페이스
+>>>>>>> 47bcbb1bdae025029b1422e25ce4414b41a3e94b
